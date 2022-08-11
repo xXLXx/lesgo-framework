@@ -46,7 +46,7 @@ describe('test serverAuthBeforeHandler with valid credentials', () => {
     secret: '2222-2222-2222-2222',
   },
 }}
-  `('should return undefined when successful', ({ clientObj }) => {
+  `('should return undefined when successful', async ({ clientObj }) => {
     const handler = {
       event: {
         headers: {
@@ -61,7 +61,7 @@ describe('test serverAuthBeforeHandler with valid credentials', () => {
     let hasError = false;
 
     try {
-      serverAuthBeforeHandler(handler, next, {
+      await serverAuthBeforeHandler(handler, next, {
         client: clientObj,
       });
     } catch (e) {
@@ -80,7 +80,7 @@ describe('test serverAuthBeforeHandler with valid credentials', () => {
     ${`Basic ${validBasicAuth}`} | ${true}
   `(
     'test Exception with valid credentials',
-    ({ Authorization, blacklistMode }) => {
+    async ({ Authorization, blacklistMode }) => {
       const handler = {
         event: {
           headers: {
@@ -95,7 +95,7 @@ describe('test serverAuthBeforeHandler with valid credentials', () => {
       let hasError = false;
 
       try {
-        serverAuthBeforeHandler(handler, next, {
+        await serverAuthBeforeHandler(handler, next, {
           blacklistMode,
         });
       } catch (e) {
@@ -155,7 +155,7 @@ describe('test serverAuthBeforeHandler error handling', () => {
 
       try {
         expect(
-          serverAuthBeforeHandler(handler, next, {
+          await serverAuthBeforeHandler(handler, next, {
             blacklistMode,
           })
         ).toThrow();
