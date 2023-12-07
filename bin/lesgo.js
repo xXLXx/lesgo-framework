@@ -5,7 +5,6 @@ const glob = require('glob');
 const path = require('path');
 const fs = require('fs');
 const babel = require('@babel/core');
-const babelPreset = require('@babel/preset-env');
 
 const optionsTabPrefix = 4;
 const optionsList = [
@@ -23,7 +22,7 @@ if (['-h', '--help', 'help', undefined].includes(process.argv[2])) {
   help();
 }
 
-findAndRequireCommands(function(group, commandName, command) {
+findAndRequireCommands(function (group, commandName, command) {
   if (process.argv[2] === commandName) {
     const commandParams = getCommandParams(command);
 
@@ -33,25 +32,23 @@ findAndRequireCommands(function(group, commandName, command) {
   }
 });
 
-function help() {
-  const colorize = function(text, color) {
-    const colors = {
-      green: '\u001b[32m',
-      reset: '\u001b[0m',
-      yellow: '\u001b[33m',
-    };
-
-    return `${colors[color]}${text}${colors.reset}`;
+function colorize(text, color) {
+  const colors = {
+    green: '\u001b[32m',
+    reset: '\u001b[0m',
+    yellow: '\u001b[33m',
   };
 
-  const version = execSync('npm view lesgo version')
-    .toString()
-    .trim();
+  return `${colors[color]}${text}${colors.reset}`;
+}
+
+function help() {
+  const version = execSync('npm view lesgo version').toString().trim();
   console.log(`Lesgo Framework ${colorize(version, 'green')}`);
   console.log(colorize('\nUsage:', 'yellow'));
   console.log(`  command [options] [arguments]`);
   console.log(colorize('\nOptions:', 'yellow'));
-  optionsList.forEach(function(option) {
+  optionsList.forEach(function (option) {
     console.log(
       `${colorize(`  ${option.signature}`, 'green')}${Array(optionsTabPrefix)
         .fill(' ')
@@ -75,7 +72,7 @@ function help() {
   let commandsTabPrefix = commandGroups.default[0].commandName.length + 4;
 
   // Find and require files under src/commands
-  findAndRequireCommands(function(group, commandName, command) {
+  findAndRequireCommands(function (group, commandName, command) {
     if (!commandGroups[group]) {
       commandGroups[group] = [];
     }
@@ -94,7 +91,7 @@ function help() {
       console.log(colorize(key, 'yellow'));
     }
 
-    commandGroups[key].forEach(function(command) {
+    commandGroups[key].forEach(function (command) {
       console.log(
         `${colorize(`  ${command.commandName}`, 'green')}${Array(
           commandsTabPrefix - command.commandName.length
@@ -117,7 +114,7 @@ function getCommandParams(command) {
    * Created a pattern to match options in order
    */
   const signatureRegex = new RegExp(
-    command.signature.replace(/\{([^\}]+)\}(?:\s|$)/g, function(matched) {
+    command.signature.replace(/\{([^\}]+)\}(?:\s|$)/g, function (matched) {
       let key = matched.trim().slice(1, -1);
       let isArgs = false;
 
@@ -177,7 +174,7 @@ function getCommandParams(command) {
 
 function findAndRequireCommands(callback) {
   try {
-    glob.sync('./src/commands/*.js').forEach(function(file) {
+    glob.sync('./src/commands/*.js').forEach(function (file) {
       const commandFile = path.resolve(
         `./.serverless/build/${path.basename(file)}.js`
       );
@@ -203,3 +200,12 @@ function findAndRequireCommands(callback) {
     }
   }
 }
+
+module.exports = {
+  help,
+  colorize,
+  optionsList,
+  optionsTabPrefix,
+  getCommandParams,
+  findAndRequireCommands,
+};
