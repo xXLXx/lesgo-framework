@@ -6,12 +6,14 @@ import isEmpty from '../../utils/isEmpty';
 
 const FILE = 'services/OpenSearchService/getClient';
 
-const singleton = {};
+let singleton = {};
 
 const getClient = async ({ region, host }, singletonConn) => {
   if (!isEmpty(singleton[singletonConn])) {
     logger.debug(`${FILE}::REUSE_CLIENT_SINGLETON`, {
       client: singleton[singletonConn],
+      singletonConn,
+      singleton
     });
     return singleton[singletonConn];
   }
@@ -34,7 +36,10 @@ const getClient = async ({ region, host }, singletonConn) => {
 };
 
 export const disconnect = async (singletonConn) => {
-  logger.debug(`${FILE}::CLOSING_ES_CONNECTIONS`);
+  logger.debug(`${FILE}::CLOSING_ES_CONNECTIONS`, {
+    singletonConn,
+    singleton
+  });
 
   if (!singletonConn) {
     await Promise.all(
@@ -43,14 +48,17 @@ export const disconnect = async (singletonConn) => {
       )
     );
 
-    singleton.length = 0;
+    singleton = {};
   } else {
     await singleton[singletonConn].close();
 
     delete singleton[singletonConn];
   }
 
-  logger.debug(`${FILE}::CLOSED_ES_CONNECTIONS`);
+  logger.debug(`${FILE}::CLOSED_ES_CONNECTIONS`, {
+    singletonConn,
+    singleton
+  });
 };
 
 export default getClient;
