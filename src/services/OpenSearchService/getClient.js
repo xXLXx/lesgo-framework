@@ -33,4 +33,24 @@ const getClient = async ({ region, host }, singletonConn) => {
   return client;
 };
 
+export const disconnect = async (singletonConn) => {
+  logger.debug(`${FILE}::CLOSING_ES_CONNECTIONS`);
+
+  if (!singletonConn) {
+    await Promise.all(
+      Object.values(singleton).map(async client =>
+        client.close()
+      )
+    );
+
+    singleton.length = 0;
+  } else {
+    await singleton[singletonConn].close();
+
+    delete singleton[singletonConn];
+  }
+
+  logger.debug(`${FILE}::CLOSED_ES_CONNECTIONS`);
+};
+
 export default getClient;
