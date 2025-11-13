@@ -26,5 +26,5 @@ import { ElastiCacheRedisClientOptions } from '../../../types/aws';
  * await client.set(key, value);
  * ```
  */
-declare const getClient: (clientOpts?: ElastiCacheRedisClientOptions) => Promise<import("ioredis/built/cluster").default>;
+declare const getClient: (clientOpts?: ElastiCacheRedisClientOptions) => Promise<import("ioredis").Cluster>;
 export default getClient;
