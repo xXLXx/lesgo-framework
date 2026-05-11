@@ -54,16 +54,18 @@ const disconnectElastiCacheRedisClient = () =>
     logger.debug(`${FILE}::PREPARING_TO_DISCONNECT`, {
       singletonConns,
     });
-    singletonConns.forEach(singletonConn =>
-      __awaiter(void 0, void 0, void 0, function* () {
-        try {
-          yield singleton[singletonConn].quit();
-          delete singleton[singletonConn];
-          logger.debug(`${FILE}::COMPLETED`, { singletonConn });
-        } catch (err) {
-          logger.error(`${FILE}::ERROR`, { singletonConn, err });
-        }
-      })
+    yield Promise.all(
+      singletonConns.map(singletonConn =>
+        __awaiter(void 0, void 0, void 0, function* () {
+          try {
+            yield singleton[singletonConn].quit();
+            delete singleton[singletonConn];
+            logger.debug(`${FILE}::COMPLETED`, { singletonConn });
+          } catch (err) {
+            logger.error(`${FILE}::ERROR`, { singletonConn, err });
+          }
+        })
+      )
     );
   });
 export default disconnectElastiCacheRedisClient;

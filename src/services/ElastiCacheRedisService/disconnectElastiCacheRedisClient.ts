@@ -24,15 +24,17 @@ const disconnectElastiCacheRedisClient = async () => {
     singletonConns,
   });
 
-  singletonConns.forEach(async singletonConn => {
-    try {
-      await singleton[singletonConn].quit();
-      delete singleton[singletonConn];
-      logger.debug(`${FILE}::COMPLETED`, { singletonConn });
-    } catch (err) {
-      logger.error(`${FILE}::ERROR`, { singletonConn, err });
-    }
-  });
+  await Promise.all(
+    singletonConns.map(async singletonConn => {
+      try {
+        await singleton[singletonConn].quit();
+        delete singleton[singletonConn];
+        logger.debug(`${FILE}::COMPLETED`, { singletonConn });
+      } catch (err) {
+        logger.error(`${FILE}::ERROR`, { singletonConn, err });
+      }
+    })
+  );
 };
 
 export default disconnectElastiCacheRedisClient;
